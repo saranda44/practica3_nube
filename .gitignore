@@ -1,0 +1,5 @@
+insert_fake_users.sh 
+*.zip 
+__pycache__/
+.env 
+build/
