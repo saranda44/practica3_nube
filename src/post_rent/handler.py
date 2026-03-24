@@ -1,5 +1,5 @@
 """
-POST /rent - Inicia un proceso de renta a través de una Step Function
+POST /rent
 
 Flujo:
 1. API Gateway recibe POST /rent con body: { "movie_id": 123, "user_id": "1" }
@@ -10,7 +10,7 @@ Flujo:
 
 Respuesta exitosa (renta iniciada):
 {
-  "execution_arn": "arn:aws:states:us-east-1:123456789:execution:RentalStateMachine",
+  "execution_arn": "arn:aws:states:us-east-1:...",
   "status": "RUNNING",
   "message": "Renta iniciada. Consulta GET /status/1 para ver el resultado"
 }
@@ -60,7 +60,6 @@ def main(event, context):
         
         # Extraer el body de la solicitud
         body = event.get('body')
-        print(f"Body recibido: {body}")
         
         # Si el body es un string parsearlo como JSON
         if isinstance(body, str):
@@ -85,7 +84,6 @@ def main(event, context):
         
         # Validar que movie_id existe
         if movie_id is None:
-            print(f"Validación fallida: campo 'movie_id' faltante")
             return {
                 'statusCode': 400,
                 'headers': {'Content-Type': 'application/json'},
@@ -96,7 +94,6 @@ def main(event, context):
         
         # Validar que user_id existe
         if not user_id:
-            print(f"Validación fallida: campo 'user_id' faltante o vacío")
             return {
                 'statusCode': 400,
                 'headers': {'Content-Type': 'application/json'},
@@ -111,9 +108,6 @@ def main(event, context):
         # =====================================================================
         # INICIAR STEP FUNCTION
         # =====================================================================
-        
-        print(f"Iniciando Step Function...")
-        
         try:
             execution = sfn_client.start_execution(
                 stateMachineArn=STATE_MACHINE_ARN_LOCAL,
@@ -157,7 +151,6 @@ def main(event, context):
     except Exception as e:
         # Loguear el error inesperado para CloudWatch
         print(f"ERROR en POST /rent: {str(e)}")
-        print(f"Tipo de error: {type(e).__name__}")
         
         return {
             'statusCode': 500,

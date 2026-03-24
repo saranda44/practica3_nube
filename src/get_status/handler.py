@@ -51,7 +51,6 @@ def main(event, context):
       },
     }
     """
-    
     try:
         print("=" * 70)
         print("INICIANDO: GET /status/{user_id}")
@@ -64,7 +63,6 @@ def main(event, context):
         
         # Validar que se proporcionó el path parameter {user_id}
         if not user_id:
-            print("path parameter 'user_id' vacío o no proporcionado")
             return {
                 'statusCode': 400,
                 'headers': {
@@ -75,8 +73,6 @@ def main(event, context):
                     'example': 'GET /status/1'
                 })
             }
-        
-        print(f"Obteniendo rentas activas del usuario: '{user_id}'")
         
         # Llamar a la función específica de db_utils
         # retorna una lista de rentals activos con títulos

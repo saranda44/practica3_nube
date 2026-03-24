@@ -67,7 +67,6 @@ def main(event, context):
     
     except Exception as e:
         print(f"Error en get_movies: {str(e)}")
-        
         return {
             'statusCode': 500,
             'body': json.dumps({
