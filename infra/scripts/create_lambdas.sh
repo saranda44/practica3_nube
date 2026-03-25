@@ -5,7 +5,7 @@ export AWS_PAGER=cat
 
 echo "=== Creando/Actualizando Lambdas en AWS ==="
 
-LAB_ROLE_ARN=$(aws iam get-role --role-name LabRole --query 'Role.Arn' --output text)
+ROLE_ARN=$(aws iam get-role --role-name LabRole --query 'Role.Arn' --output text)
 RUNTIME="python3.12"
 HANDLER="handler.main"
 TIMEOUT="60"
@@ -59,7 +59,7 @@ for dir in src/*; do
             aws lambda create-function \
                 --function-name "$FUNC_NAME" \
                 --runtime "$RUNTIME" \
-                --role "$LAB_ROLE_ARN" \
+                --role "$ROLE_ARN" \
                 --handler "$HANDLER" \
                 --zip-file "fileb://$ZIP_FILE" \
                 --timeout "$TIMEOUT" \
@@ -70,7 +70,7 @@ for dir in src/*; do
             aws lambda create-function \
                 --function-name "$FUNC_NAME" \
                 --runtime "$RUNTIME" \
-                --role "$LAB_ROLE_ARN" \
+                --role "$ROLE_ARN" \
                 --handler "$HANDLER" \
                 --zip-file "fileb://$ZIP_FILE" \
                 --timeout "$TIMEOUT" \

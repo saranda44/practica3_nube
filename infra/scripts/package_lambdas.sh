@@ -57,7 +57,7 @@ for func in "$SRC_DIR"/*; do
 
                 pip install --upgrade pip
 
-                # ✅ instalación NORMAL (sin hacks)
+                # instalación NORMAL (sin hacks)
                 pip install -r "$REQ_FILE"
 
                 # Obtener site-packages

@@ -18,13 +18,13 @@ Respuesta exitosa (renta iniciada):
 
 import json
 import boto3
+import os
 
 # Cliente para Step Functions
 sfn_client = boto3.client('stepfunctions', region_name='us-east-1')
 
-# ARN de la Step Function 
-# se obtiene de una variable de ambiente
-STATE_MACHINE_ARN = None  
+# Obtener el ARN de la Step Function desde variables de ambiente
+STATE_MACHINE_ARN_LOCAL = os.environ.get('STATE_MACHINE_ARN')
 
 
 def main(event, context):
@@ -42,10 +42,6 @@ def main(event, context):
         print("=" * 70)
         print("INICIANDO: POST /rent")
         print("=" * 70)
-        
-        # Obtener el ARN de la Step Function desde variables de ambiente
-        import os
-        STATE_MACHINE_ARN_LOCAL = os.environ.get('STATE_MACHINE_ARN')
         
         # Verificar que la Step Function ARN está configurada
         if not STATE_MACHINE_ARN_LOCAL:
