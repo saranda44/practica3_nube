@@ -1,0 +1,123 @@
+{
+  "Comment": "Maquina de estados sencilla para rentar peliculas",
+  "StartAt": "CheckMovieExists",
+  "States": {
+    "CheckMovieExists": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-1:$AWS_ACCOUNT:function:check_movie_exists",
+      "Next": "ValidarPeliculaExiste"
+    },
+    "ValidarPeliculaExiste": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "And": [
+            {
+              "Variable": "$.error",
+              "IsPresent": true
+            },
+            {
+              "Variable": "$.error",
+              "StringEquals": "Movie does not exist"
+            }
+          ],
+          "Next": "ErrorPeliculaNoExiste"
+        }
+      ],
+      "Default": "CheckMovieAvailable"
+    },
+    "CheckMovieAvailable": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-1:$AWS_ACCOUNT:function:check_movie_available",
+      "Next": "ValidarDisponibilidad"
+    },
+    "ValidarDisponibilidad": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "And": [
+            {
+              "Variable": "$.error",
+              "IsPresent": true
+            },
+            {
+              "Variable": "$.error",
+              "StringEquals": "Movie is not available"
+            }
+          ],
+          "Next": "ErrorPeliculaNoDisponible"
+        }
+      ],
+      "Default": "CheckUserLimit"
+    },
+    "CheckUserLimit": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-1:$AWS_ACCOUNT:function:check_user_limit",
+      "Next": "ValidarLimiteUsuario"
+    },
+    "ValidarLimiteUsuario": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "And": [
+            {
+              "Variable": "$.error",
+              "IsPresent": true
+            },
+            {
+              "Variable": "$.error",
+              "StringEquals": "User has reached the rental limit"
+            }
+          ],
+          "Next": "ErrorLimiteUsuario"
+        }
+      ],
+      "Default": "CreateRental"
+    },
+    "CreateRental": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-1:$AWS_ACCOUNT:function:create_rental",
+      "Next": "ValidarInsert"
+    },
+    "ValidarInsert": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "And": [
+            {
+              "Variable": "$.error",
+              "IsPresent": true
+            },
+            {
+              "Variable": "$.error",
+              "StringEquals": "Database error while creating rental"
+            }
+          ],
+          "Next": "ErrorInsertarRenta"
+        }
+      ],
+      "Default": "RentalSucceeded"
+    },
+    "RentalSucceeded": {
+      "Type": "Succeed"
+    },
+    "ErrorPeliculaNoExiste": {
+      "Type": "Fail",
+      "Error": "MovieNotFound",
+      "Cause": "La pelicula no existe"
+    },
+    "ErrorPeliculaNoDisponible": {
+      "Type": "Fail",
+      "Error": "MovieNotAvailable",
+      "Cause": "La pelicula no esta disponible"
+    },
+    "ErrorLimiteUsuario": {
+      "Type": "Fail",
+      "Error": "UserLimitReached",
+      "Cause": "El usuario alcanzo su limite de rentas"
+    },
+    "ErrorInsertarRenta": {
+      "Type": "Fail"
+    }
+  }
+}
