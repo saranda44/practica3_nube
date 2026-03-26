@@ -2,14 +2,12 @@
 set -e
 export AWS_PAGER=cat
 
-# extraemos variables a traves de aws cli
 RULE_NAME="filmrentals-expiry-check"
 LAMBDA_NAME="expiry_alerts"
-REGION=$(aws configure get region)
 ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-LAMBDA_ARN="arn:aws:lambda:$REGION:$ACCOUNT_ID:function:$LAMBDA_NAME"
+LAMBDA_ARN="arn:aws:lambda:us-east-1:$ACCOUNT_ID:function:$LAMBDA_NAME"
 
-# Cron: todos los dias a las 8am (se tiene que cambiar para hacer pruebas)
+# Cron: todos los dias a las 8am
 RULE_ARN=$(aws events put-rule \
     --name "$RULE_NAME" \
     --schedule-expression "cron(0 8 * * ? *)" \
@@ -24,6 +22,6 @@ aws lambda add-permission \
     --statement-id "eventbridge-$RULE_NAME" \
     --action "lambda:InvokeFunction" \
     --principal events.amazonaws.com \
-    --source-arn "$RULE_ARN" 2>/dev/null || true
+    --source-arn "$RULE_ARN"
 
-echo "EventBridge: $RULE_NAME - $LAMBDA_NAME (diario 8am)"
+echo "EventBridge creado: $RULE_NAME -> $LAMBDA_NAME (diario 8am)"

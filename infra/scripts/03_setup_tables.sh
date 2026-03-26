@@ -13,7 +13,7 @@ CREDENTIALS=$(aws secretsmanager get-secret-value \
 DB_USER=$(echo "$CREDENTIALS" | python3 -c "import sys,json; print(json.load(sys.stdin)['username'])")
 export PGPASSWORD=$(echo "$CREDENTIALS" | python3 -c "import sys,json; print(json.load(sys.stdin)['password'])")
 
-echo "tablas..."
+echo "Creando tablas..."
 
 psql --host="$RDS_HOST" --port=5432 --username="$DB_USER" --dbname="filmrentals" <<'EOF'
 CREATE TABLE IF NOT EXISTS movies (
@@ -39,4 +39,4 @@ CREATE TABLE IF NOT EXISTS users (
 );
 EOF
 
-echo "Tablas: movies, rentals, users"
+echo "Tablas creadas: movies, rentals, users"

@@ -1,25 +1,17 @@
 #!/bin/bash
 set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/.env"
+
 export AWS_PAGER=cat
-
-DB_INSTANCE_ID="filmrentals-db"
-DB_NAME="filmrentals"
-DB_USER="postgres"
-DB_PASSWORD="$1"
-REGION=$(aws configure get region)
-
-if [ -z "$DB_PASSWORD" ]; then
-    echo "Uso: bash 01_create_rds.sh <password>"
-    exit 1
-fi
 
 VPC_ID=$(aws ec2 describe-vpcs --filters "Name=isDefault,Values=true" --query 'Vpcs[0].VpcId' --output text)
 SG_ID=$(aws ec2 describe-security-groups \
     --filters "Name=vpc-id,Values=$VPC_ID" "Name=group-name,Values=default" \
     --query 'SecurityGroups[0].GroupId' --output text)
 
-echo "instancia RDS..."
-
+echo "Creando instancia RDS..."
 aws rds create-db-instance \
     --db-instance-identifier "$DB_INSTANCE_ID" \
     --db-name "$DB_NAME" \
@@ -33,15 +25,17 @@ aws rds create-db-instance \
     --publicly-accessible \
     --backup-retention-period 0 \
     --no-multi-az \
-    --region "$REGION"
+    --region us-east-1
 
-echo "Esperando disponibilidad"
+echo "Esperando que RDS esté disponible..."
 aws rds wait db-instance-available --db-instance-identifier "$DB_INSTANCE_ID"
 
-RDS_HOST=$(aws rds describe-db-instances \
+RDSHOST=$(aws rds describe-db-instances \
     --db-instance-identifier "$DB_INSTANCE_ID" \
     --query 'DBInstances[0].Endpoint.Address' \
     --output text)
 
-echo "RDS: $RDS_HOST"
-echo "Siguiente: bash 02_create_secrets.sh $RDS_HOST $DB_PASSWORD"
+echo "RDS listo en: $RDSHOST"
+echo ""
+echo "Guarda este valor para el .env:"
+echo "export RDSHOST=$RDSHOST"
